@@ -1,0 +1,174 @@
+syntax = "proto3";
+
+package ozon.wms.go.service.batching.split.api.v2;
+
+option go_package = "gitlab.ozon.ru/wms/go/service/batching/split/pkg/v2";
+option csharp_namespace = "Ozon.Wms.Go.Service.Batching.Split.V2";
+
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/protobuf/empty.proto";
+import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
+
+
+option(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info : {
+        title : "WMS SPLIT API"
+    }
+
+	external_docs: {
+		url: "https://confluence.ozon.ru/x/fEz8BQ"
+        description: "Confluence Page"
+    }
+
+    security_definitions: {
+        security: {
+            key: "x-o3-app-name"
+            value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "x-o3-app-name"
+            }
+        },
+        security: {
+            key: "x-o3-app-version"
+            value: {
+                type: TYPE_API_KEY
+                in: IN_HEADER
+                name: "x-o3-app-version"
+            }
+        }
+    }
+
+    security : {
+        security_requirement: {
+            key: "x-o3-app-name"
+            value: {}
+        },
+        security_requirement: {
+            key: "x-o3-app-version"
+            value: {}
+        }
+    }
+
+    responses: {
+        key: "400"
+        value: {
+            description: "Returned when the request is not correct."
+        }
+    }
+};
+
+service Split {
+    rpc SplitPosting (SplitPostingRequest) returns (SplitPostingResponse) {
+        option (google.api.http) = {
+          post: "/v2/split-posting"
+          body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            operation_id: "split-v2-split-posting"
+        };
+    }
+
+    rpc SplitPostingWhComm (SplitPostingWhCommRequest) returns (SplitPostingWhCommResponse) {
+        option (google.api.http) = {
+          post: "/v2/split-posting-whcomm"
+          body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            operation_id: "split-v2-split-posting-whcom"
+        };
+    }
+
+    rpc AddPostingsSplitReasons (PostingsSplitReasonsRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+          post: "/v2/split-postings-reasons/add"
+          body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            operation_id: "split-v2-split-postings-reasons-add"
+        };
+    }
+
+    rpc SplitPostingByTags (SplitPostingRequest) returns (SplitPostingResponse) {
+        option (google.api.http) = {
+          post: "/v2/split-posting-by-tags"
+          body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            operation_id: "split-v2-split-posting-by-tags"
+        };
+
+    }
+
+}
+
+message PostingsSplitReasonsRequest {
+    repeated PostingSplitReasons postings_split_reasons = 1 [(validate.rules).repeated = {min_items: 1}];
+}
+
+message PostingSplitReasons {
+    int64 posting_id = 1 [(validate.rules).int64.gt = 0];
+    repeated SplitReason split_reasons = 2 [(validate.rules).repeated = {min_items: 1}];
+}
+
+message Restrict {
+    google.protobuf.DoubleValue price = 1 [json_name = "price"];
+    google.protobuf.DoubleValue weight_gr = 2 [json_name = "weight_gr"];
+}
+
+message Item {
+    int64 item_id = 1 [json_name = "item_id"];
+    google.protobuf.Int64Value delivery_variant_id = 2 [json_name = "delivery_variant_id"];
+    google.protobuf.Int64Value seller_id = 3 [json_name = "seller_id"];
+    int32 qty = 4 [json_name = "qty"];
+    double weight_gr = 5 [json_name = "weight_gr"];
+    int64 width_mm = 6 [json_name = "width_mm"];
+    int64 height_mm = 7 [json_name = "height_mm"];
+    int64 length_mm = 8 [json_name = "length_mm"];
+    double price = 9 [json_name = "price"];
+}
+
+message SplitCollection {
+    repeated Item items = 1;
+    repeated SplitReason split_reasons = 2;
+}
+
+message SplitPostingRequest {
+    int64 warehouse_id = 1 [json_name = "warehouse_id"];
+    int64 virtual_posting_id = 2 [json_name = "virtual_posting_id"];
+    repeated Item items = 3;
+    Restrict restrict = 4;
+    google.protobuf.BoolValue split_for_mono_prohibited = 5;
+    bool is_legal = 6 [json_name = "is_legal"];
+}
+
+message SplitPostingResponse {
+    repeated SplitCollection splits = 1;
+}
+
+message SplitPostingWhCommRequest {
+    int64 warehouse_id = 1 [json_name = "warehouse_id"];
+    google.protobuf.Int64Value delivery_variant_id = 2 [json_name = "delivery_variant_id"];
+    google.protobuf.Int64Value seller_id = 3 [json_name = "seller_id"];
+    repeated Item items = 4;
+    Restrict restrict = 5;
+    bool is_legal = 6 [json_name = "is_legal"];
+}
+
+message SplitPostingWhCommResponse {
+    repeated SplitCollection splits = 1;
+}
+
+enum SplitReason {
+    NotSplitted = 0;
+    PhysicalCharacteristics = 1;
+    ItemTags = 2;
+    Price = 3;
+    Weight = 4;
+    Volume = 5;
+    SingleInstanceTags = 6;
+    MaxQty = 7;
+    Mono = 8;
+}

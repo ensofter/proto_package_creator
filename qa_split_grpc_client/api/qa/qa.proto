@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package ozon.wms.go.service.batching.split.api.qa;
+
+option go_package = "gitlab.ozon.ru/wms/go/service/batching/split/pkg/qa";
+option csharp_namespace = "Ozon.Wms.Go.Service.Batching.Split.QA";
+
+
+service Qa {
+    rpc RemoveOldest (RemoveOldestRequest) returns (RemoveOldestResponse);
+}
+
+message RemoveOldestRequest {
+}
+
+message RemoveOldestResponse {
+}
