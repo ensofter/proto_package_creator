@@ -1,14 +1,2 @@
-version: v2
-language: golang
-project_repo: gitlab.ozon.ru/whc/go/api/supply
 proto_paths:
     - api
-pkg_proto_paths:
-    - api/xdock/v1
-    - api/constants
-ignore_dirs: []
-local_dependencies:
-    - github.com/envoyproxy/protoc-gen-validate/validate/validate.proto@master
-external_services:
-    - import: gitlab.ozon.ru/whc/go/api/supply/api/constants/constants.proto@a03741cf776ad8618ca514a72b89693f86027f68
-    - import: gitlab.ozon.ru/whc/go/service/supply/api/xdock/v1/xdock.proto@9e56271285fd909064711cb13c46430969d55660
